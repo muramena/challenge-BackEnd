@@ -1,7 +1,6 @@
-// verifyAdmin, verifyClient
 const jwt = require('jsonwebtoken');
 
-let verifyClient = (req, res, next) => {
+let verifyToken = (req, res, next) => {
 
     let token = req.get('token');
 
@@ -23,6 +22,25 @@ let verifyClient = (req, res, next) => {
 
 };
 
+let verifyAdminRole = (req, res, next) => {
+
+    let user = req.user;
+
+    if (user.role === 'ADMIN') {
+        next();
+    } else {
+
+        return res.json({
+            ok: false,
+            err: {
+                message: 'El usuario no es administrador'
+            }
+        });
+    }
+};
+
+
 module.exports = {
-    verifyClient
+    verifyToken,
+    verifyAdminRole
 }

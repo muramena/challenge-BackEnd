@@ -9,5 +9,4 @@ app.use(require('./room'));
 app.use(require('./ticket'));
 app.use(require('./user'));
 
-console.log('rutas cargadas');
 module.exports = app;

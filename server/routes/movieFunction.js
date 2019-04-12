@@ -8,5 +8,10 @@ const MovieFunction = require('../models/movieFunction');
 const app = express();
 
 app.get('/function', (req, res) => {
-
+    res.json({
+        ok: true,
+        message: 'Obtener funciones'
+    });
 });
+
+module.exports = app;

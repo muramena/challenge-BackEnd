@@ -51,13 +51,13 @@ let userSchema = new Schema({
     }
 });
 
-usuarioSchema.plugin(uniqueValidator, { message: '{PATH} debe de ser único' });
+userSchema.plugin(uniqueValidator, { message: '{PATH} debe de ser único' });
 
 module.exports = mongoose.model('User', userSchema);
 
 
 
-// usuarioSchema.methods.toJSON = function() {
+// userSchema.methods.toJSON = function() {
 
 //     let user = this;
 //     let userObject = user.toObject();
