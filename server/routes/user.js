@@ -10,6 +10,7 @@ const _ = require('underscore');
 const app = express();
 
 app.get('/user', (req, res) => {
+
     let skip = req.query.skip || 0;
     skip = Number(skip);
 
@@ -42,7 +43,7 @@ app.get('/user', (req, res) => {
 
 });
 
-app.post('/user', function (req, res) {
+app.post('/user', (req, res) => {
 
     let body = req.body;
 
@@ -68,12 +69,12 @@ app.post('/user', function (req, res) {
         res.json({
             ok: true,
             user: userDB
-        })
+        });
     });
 
 });
 
-app.put('/user/:id', function (req, res) {
+app.put('/user/:id', (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['name', 'lastname', 'img', 'role', 'address', 'phone']);
@@ -92,11 +93,38 @@ app.put('/user/:id', function (req, res) {
             user: userDB
         });
 
-    })
+    });
 
 });
 
-app.delete('/user', function (req, res) {
+app.delete('/user', (req, res) => {
+
+    let logicRemove = {
+        state: false
+    };
+
+    User.findByIdAndUpdate(id, logicRemove, { new: true, runValidators: true }, (err, userDB) => {
+
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        res.json({
+            ok: true,
+            message: 'El usuario ha sido borrado'
+        });
+
+    });
 
 });
 
