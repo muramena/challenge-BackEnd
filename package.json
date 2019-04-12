@@ -1,0 +1,18 @@
+{
+  "name": "challenge-back",
+  "version": "1.0.0",
+  "description": "Challenge de BackEnd(cine)\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D \u001b[C\u001b[D(cine)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Martin Mena",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.5",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.5.0",
+    "mongoose-unique-validator": "^2.0.2"
+  }
+}
