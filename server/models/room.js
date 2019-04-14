@@ -14,7 +14,15 @@ const roomSchema = new Schema({
     number: {
         type: Number,
         required: true
+    },
+    state: {
+        type: Boolean,
+        default: true
     }
 });
+
+// TRIGGER PREVIO A LA ELIMINACION
+// ELIMINA TODAS LAS FUNCIONES FUTURAS EN LA SALA
+
 
 module.exports = mongoose.model('Room', roomSchema);

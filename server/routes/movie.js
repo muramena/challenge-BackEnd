@@ -46,7 +46,8 @@ app.post('/movie', (req, res) => {
 
     let movie = new Movie({
         title: body.title,
-        minutes: body.minutes
+        minutes: body.minutes,
+        year: body.year
     });
 
     movie.save((err, movieDB) => {
@@ -68,7 +69,7 @@ app.post('/movie', (req, res) => {
 app.put('/movie/:id', (req, res) => {
 
     let id = req.params.id;
-    let body = _.pick(req.body, ['title', 'minutes']);
+    let body = _.pick(req.body, ['title', 'minutes', 'year']);
 
     Movie.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, movieDB) => {
 

@@ -36,17 +36,19 @@ app.get('/function', (req, res) => {
                 });
             }
 
-            let moviefunction = { 
-                Room: movieFunctions[0].idRoom.number,
-                Cinema: movieFunctions[0].idRoom.idCinema.name,
-                Movie: movieFunctions[0].idMovie.title,
-                Date: movieFunctions[0].date
-            }
+            let functions = [];
+            movieFunctions = movieFunctions.map(movieF => {
+                functions.push({
+                    Room: movieF.idRoom.number,
+                    Cinema: movieF.idRoom.idCinema.name,
+                    Movie: movieF.idMovie.title,
+                    Date: movieF.date
+                })
+            });
 
             res.json({
                 ok: true,
-                moviefunction,
-                functions: movieFunctions
+                functions
             });
 
         });
@@ -90,6 +92,8 @@ app.put('/function/:id', (req, res) => {
 app.delete('/function/:id', (req, res) => {
 
     let id = req.params.id;
+
+    //ELIMINA TICKETS
 
 });
 

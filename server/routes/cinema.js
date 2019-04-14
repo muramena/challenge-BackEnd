@@ -1,7 +1,8 @@
-// Cliente: 
-// Admin: GET, POST, PUT, DELETE
+// Validación de token, validación de Rol
+
 const express = require('express');
 const Cinema = require('../models/cinema');
+const Room = require('../models/room');
 const _ = require('underscore');
 
 const app = express();
@@ -69,21 +70,21 @@ app.put('/cinema/:id', (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['name']);
 
-    Cinema.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, cinemaDB) => {
+        Cinema.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, cinemaDB) => {
 
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                cinema: cinemaDB
             });
-        }
 
-        res.json({
-            ok: true,
-            cinema: cinemaDB
         });
-
-    });
 
 });
 
@@ -94,7 +95,7 @@ app.delete('/cinema/:id', (req, res) => {
     let logicRemove = {
         state: false
     };
-
+    
     Cinema.findByIdAndUpdate(id, logicRemove,  { new: true, runValidators: true }, (err, cinemaDB) => {
 
         if (err) {

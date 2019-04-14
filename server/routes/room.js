@@ -14,7 +14,7 @@ app.get('/room', function(req, res) {
     let limit = req.query.limit || 20;
     limit = Number(limit);
 
-    Room.find({})
+    Room.find({ state: true})
             .skip(skip)
             .limit(limit)
             .populate('idCinema', 'name')
@@ -122,6 +122,8 @@ app.put('/room/:id', (req, res) => {
 app.delete('/room/:id', (req, res) => {
 
     let id = req.params.id;
+
+    //ELIMINA FUNCIONES FUTURAS
 
     Room.findByIdAndDelete(id, { runValidators: true }, (err, roomDB) => {
 
