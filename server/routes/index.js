@@ -1,8 +1,11 @@
 const express = require('express');
+
+// NO VA
 const reiniciarBDD = require('../../Iniciar BDD/iniciar');
 
 const app = express();
 
+app.use(require('./login'));
 app.use(require('./cinema'));
 app.use(require('./movie'));
 app.use(require('./movieFunction'));

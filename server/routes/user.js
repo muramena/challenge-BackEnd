@@ -6,10 +6,25 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const {  } = require('../middleware/authentication');
 const _ = require('underscore');
+const { verifyAdminRole, verifyToken } = require('../middleware/authentication');
 
 const app = express();
 
-app.get('/user', (req, res) => {
+app.get('/user', [verifyToken, verifyAdminRole], (req, res) => {
+
+    let searchParams = {
+        state: true
+    }
+
+    let name = req.query.name;
+    if (name) {
+        searchParams.name =  { "$regex": name, "$options": "i" };
+    }
+
+    let lastname = req.query.lastname;
+    if (lastname) {
+        searchParams.lastname =  { "$regex": lastname, "$options": "i" };
+    }
 
     let skip = req.query.skip || 0;
     skip = Number(skip);
@@ -17,7 +32,7 @@ app.get('/user', (req, res) => {
     let limit = req.query.limit || 20;
     limit = Number(limit);
 
-    User.find({ state: true }, 'name lastname email address phone img role')
+    User.find(searchParams, 'name lastname email address phone img role')
         .skip(skip)
         .limit(limit)
         .exec((err, users) => {
@@ -29,7 +44,7 @@ app.get('/user', (req, res) => {
                 });
             }
 
-            User.countDocuments({ state: true }, (err, total) => {
+            User.countDocuments(searchParams, (err, total) => {
 
                 res.json({
                     ok: true,
@@ -43,7 +58,7 @@ app.get('/user', (req, res) => {
 
 });
 
-app.post('/user', (req, res) => {
+app.post('/user', [verifyToken, verifyAdminRole], (req, res) => {
 
     let body = req.body;
 
@@ -74,7 +89,7 @@ app.post('/user', (req, res) => {
 
 });
 
-app.put('/user/:id', (req, res) => {
+app.put('/user/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['name', 'lastname', 'img', 'role', 'address', 'phone']);
@@ -97,7 +112,7 @@ app.put('/user/:id', (req, res) => {
 
 });
 
-app.delete('/user', (req, res) => {
+app.delete('/user', [verifyToken, verifyAdminRole], (req, res) => {
 
     let logicRemove = {
         state: false

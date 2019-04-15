@@ -3,10 +3,11 @@
 const express = require('express');
 const Room = require('../models/room');
 const _ = require('underscore');
+const { verifyAdminRole, verifyToken } = require('../middleware/authentication');
 
 const app = express();
 
-app.get('/room', function(req, res) {
+app.get('/room', [verifyToken, verifyAdminRole], function(req, res) {
     
     let skip = req.query.skip || 0;
     skip = Number(skip);
@@ -14,7 +15,7 @@ app.get('/room', function(req, res) {
     let limit = req.query.limit || 20;
     limit = Number(limit);
 
-    Room.find({ state: true})
+    Room.find({ state: true })
             .skip(skip)
             .limit(limit)
             .populate('idCinema', 'name')
@@ -41,36 +42,36 @@ app.get('/room', function(req, res) {
 
 });
 
-app.get('/room/:id', (req, res) => {
+app.get('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
 
     Room.find()
-            .populate({
-                path: 'idCinema',
-                match: { _id: id }
-            })
-            .exec((err, rooms) => {
+        .populate({
+            path: 'idCinema',
+            match: { _id: id }
+        })
+        .exec((err, rooms) => {
 
-                if (err) {
-                    return res.status(400).json({
-                        ok: false,
-                        err
-                    });
-                }
-    
-                rooms = rooms.filter(room => room.idCinema != null);
-
-                res.json({
-                    ok: true,
-                    rooms
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
                 });
+            }
 
+            rooms = rooms.filter(room => room.idCinema != null);
+
+            res.json({
+                ok: true,
+                rooms
             });
+
+        });
 
 });
 
-app.post('/room', (req, res) => {
+app.post('/room', [verifyToken, verifyAdminRole], (req, res) => {
     
     let body = req.body;
 
@@ -96,7 +97,7 @@ app.post('/room', (req, res) => {
 
 });
 
-app.put('/room/:id', (req, res) => {
+app.put('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
  
     let id = req.params.id;
     let body = _.pick(req.body, ['number', 'capacity']);
@@ -119,7 +120,7 @@ app.put('/room/:id', (req, res) => {
 
 });
 
-app.delete('/room/:id', (req, res) => {
+app.delete('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
 

@@ -3,18 +3,28 @@
 const express = require('express');
 const Movie = require('../models/movie');
 const _ = require('underscore');
+const { verifyAdminRole, verifyToken } = require('../middleware/authentication');
 
 const app = express();
 
-app.get('/movie', (req, res) => {
+app.get('/movie', [verifyToken, verifyAdminRole], (req, res) => {
     
+    let searchParams = {
+        state: true
+    }
+
+    let title = req.query.title;
+    if (title) {
+        searchParams.title =  { "$regex": title, "$options": "i" };
+    }
+
     let skip = req.query.skip || 0;
     skip = Number(skip);
 
     let limit = req.query.limit || 20;
     limit = Number(limit);
 
-    Movie.find({ state: true })
+    Movie.find(searchParams)
             .skip(skip)
             .limit(limit)
             .exec((err, movies) => {
@@ -26,7 +36,7 @@ app.get('/movie', (req, res) => {
                     });
                 }
     
-                Movie.countDocuments({ state: true }, (err, total) => {
+                Movie.countDocuments(searchParams, (err, total) => {
     
                     res.json({
                         ok: true,
@@ -40,7 +50,7 @@ app.get('/movie', (req, res) => {
 
 });
 
-app.post('/movie', (req, res) => {
+app.post('/movie', [verifyToken, verifyAdminRole], (req, res) => {
 
     let body = req.body;
 
@@ -66,7 +76,7 @@ app.post('/movie', (req, res) => {
 
 });
 
-app.put('/movie/:id', (req, res) => {
+app.put('/movie/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['title', 'minutes', 'year']);
@@ -89,7 +99,7 @@ app.put('/movie/:id', (req, res) => {
 
 });
 
-app.delete('/movie/:id', (req, res) => {
+app.delete('/movie/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
 

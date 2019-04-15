@@ -4,18 +4,28 @@ const express = require('express');
 const Cinema = require('../models/cinema');
 const Room = require('../models/room');
 const _ = require('underscore');
+const { verifyAdminRole, verifyToken } = require('../middleware/authentication');
 
 const app = express();
 
-app.get('/cinema', (req, res) => {
+app.get('/cinema', [verifyToken, verifyAdminRole], (req, res) => {
     
+    let searchParams = {
+        state: true
+    }
+
+    let name = req.query.name;
+    if (name) {
+        searchParams.name = { "$regex": name, "$options": "i" };
+    }
+
     let skip = req.query.skip || 0;
     skip = Number(skip);
 
     let limit = req.query.limit || 20;
     limit = Number(limit);
 
-    Cinema.find({ state: true })
+    Cinema.find(searchParams)
             .skip(skip)
             .limit(limit)
             .exec((err, cinemas) => {
@@ -27,7 +37,7 @@ app.get('/cinema', (req, res) => {
                     });
                 }
     
-                Cinema.countDocuments({ state: true }, (err, total) => {
+                Cinema.countDocuments(searchParams, (err, total) => {
     
                     res.json({
                         ok: true,
@@ -41,7 +51,7 @@ app.get('/cinema', (req, res) => {
 
 });
 
-app.post('/cinema', (req, res) => {
+app.post('/cinema', [verifyToken, verifyAdminRole], (req, res) => {
 
     let body = req.body;
 
@@ -65,7 +75,7 @@ app.post('/cinema', (req, res) => {
 
 });
 
-app.put('/cinema/:id', (req, res) => {
+app.put('/cinema/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['name']);
@@ -88,7 +98,7 @@ app.put('/cinema/:id', (req, res) => {
 
 });
 
-app.delete('/cinema/:id', (req, res) => {
+app.delete('/cinema/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
 
