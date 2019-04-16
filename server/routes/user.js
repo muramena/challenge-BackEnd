@@ -16,6 +16,9 @@ app.get('/user', [verifyToken, verifyAdminRole], (req, res) => {
         state: true
     }
 
+    console.log(req.user._id);
+    console.log(req.user.name);
+
     let name = req.query.name;
     if (name) {
         searchParams.name =  { "$regex": name, "$options": "i" };
@@ -58,7 +61,7 @@ app.get('/user', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
-app.post('/user', [verifyToken, verifyAdminRole], (req, res) => {
+app.post('/user', (req, res) => {
 
     let body = req.body;
 

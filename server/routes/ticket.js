@@ -6,7 +6,7 @@ const MovieFunction = require('../models/movieFunction');
 const app = express();
 const { verifyAdminRole, verifyToken } = require('../middleware/authentication');
 
-app.get('/ticket', function(req, res) {
+app.get('/ticket', [verifyToken, verifyAdminRole], function(req, res) {
     
     let searchParams = {}
 
@@ -70,13 +70,13 @@ app.get('/ticket', function(req, res) {
 
 });
 
-app.post('/ticket', (req, res) => {
+app.post('/ticket', verifyToken, (req, res) => {
 
     let body = req.body;
 
     let ticket = new Ticket({
         idMovieFunction: body.idMovieFunction,
-        idUser: body.idUser,
+        idUser: req.user._id,
         amount: body.amount
     });
 
@@ -102,8 +102,6 @@ app.post('/ticket', (req, res) => {
                         err
                     });
                 }
-
-                console.log(movieFunction.idRoom.capacity);
 
                 if (movieFunction.idRoom.capacity >= totalSold + ticket.amount) {
 
