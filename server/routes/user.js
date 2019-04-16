@@ -1,6 +1,3 @@
-// Cliente: 
-// Admin: GET, PUT, POST, DELETE
-
 const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
@@ -10,22 +7,26 @@ const { verifyAdminRole, verifyToken } = require('../middleware/authentication')
 
 const app = express();
 
+/**
+ * OBTENER TODOS LOS USUARIOS
+ * El usuario debe estar logeado y ser ADMIN
+ * Se pueden enviar como parametros opcionales un name, lastname, skip y limit
+ */
 app.get('/user', [verifyToken, verifyAdminRole], (req, res) => {
 
     let searchParams = {
         state: true
     }
 
-    console.log(req.user._id);
-    console.log(req.user.name);
-
     let name = req.query.name;
     if (name) {
+        // Busca por coincidencia parcial, no hace falta que sea completa
         searchParams.name =  { "$regex": name, "$options": "i" };
     }
 
     let lastname = req.query.lastname;
     if (lastname) {
+        // Busca por coincidencia parcial, no hace falta que sea completa
         searchParams.lastname =  { "$regex": lastname, "$options": "i" };
     }
 
@@ -61,6 +62,12 @@ app.get('/user', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
+/**
+ * CREAR UN USUARIO
+ * Se envia en el body un name, lastname, email, password, role, address, phone e img
+ * (role e img son opcionales)
+ * (role por defecto es CLIENT)
+ */
 app.post('/user', (req, res) => {
 
     let body = req.body;
@@ -92,6 +99,12 @@ app.post('/user', (req, res) => {
 
 });
 
+/**
+ * MODIFICAR UN USUARIO
+ * El usuario debe estar logeado y ser ADMIN
+ * Se obtiene por URL el ID del usuario a modificar
+ * Se pueden enviar en el body un name, lastname, img, role, address y un phone
+ */
 app.put('/user/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
@@ -115,7 +128,15 @@ app.put('/user/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
-app.delete('/user', [verifyToken, verifyAdminRole], (req, res) => {
+/**
+ * ELIMINAR UN USUARIO
+ * El usuario debe estar logeado y ser ADMIN
+ * Se recibe por URL el ID del usuario a eliminar
+ * Efectua una eliminacion logica
+ */
+app.delete('/user/:id', [verifyToken, verifyAdminRole], (req, res) => {
+
+    let id = req.params.id;
 
     let logicRemove = {
         state: false

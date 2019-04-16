@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+// Verifica si el token es valido, en caso contrario detiene la consulta y devuelve un status 401
 let verifyToken = (req, res, next) => {
 
     let token = req.get('token');
@@ -22,6 +23,7 @@ let verifyToken = (req, res, next) => {
 
 };
 
+// Verifica si el usuario es ADMINI, en caso contrario detiene la consulta
 let verifyAdminRole = (req, res, next) => {
 
     let user = req.user;

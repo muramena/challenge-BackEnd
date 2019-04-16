@@ -19,7 +19,7 @@ const cinemaSchema = new Schema({
 
 // TRIGGER PREVIO A LA ELIMINACION
 // ELIMINA TODAS LAS SALAS DEL CINE ANTES DEL ELMINAR AL CINE MISMO
-cinemaSchema.pre('findOneAndUpdate', async function(){
+cinemaSchema.pre('findOneAndUpdate', async () => {
 
     if (this._update.state === false) {
 

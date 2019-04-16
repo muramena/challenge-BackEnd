@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const MovieFunction = require('./movieFunction');
-const Ticket = require('./ticket');
+// Si funcionara el trigger de mas abajo, son necesarias estas dependencias
+// const MovieFunction = require('./movieFunction');
+// const Ticket = require('./ticket');
 const Schema = mongoose.Schema;
 
 const roomSchema = new Schema({

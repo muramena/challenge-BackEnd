@@ -5,6 +5,11 @@ const User = require('../models/user');
 
 const app = express();
 
+/**
+ * LOGEO
+ * Genera un token si el mail y la contraseña son correctos
+ * Ambos se envian en el body
+ */
 app.post('/login', (req, res) => {
 
     let body = req.body;
@@ -36,6 +41,7 @@ app.post('/login', (req, res) => {
             });
         }
 
+        // Tanto process.env.SEED como process.env.Token_Expiration se encuentran definidos en config/config.js
         let token = jwt.sign({user: userDB}, process.env.SEED, { expiresIn: process.env.Token_Expiration });
 
         res.json({

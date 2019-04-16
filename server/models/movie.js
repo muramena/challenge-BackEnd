@@ -14,7 +14,8 @@ const movieSchema = new Schema({
         // Se usa para validar que mientras se esta dando una función, no se pueda usar la sala para otra
         // Por default se asume que la pelicula dura 3hs
         type: Number,
-        default: 180 
+        default: 180,
+        min: 1
     },
     state: {
         type: Boolean,

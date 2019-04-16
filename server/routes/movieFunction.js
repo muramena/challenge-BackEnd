@@ -7,7 +7,12 @@ const { verifyAdminRole, verifyToken } = require('../middleware/authentication')
 
 const app = express();
 
-//Obtener todas las funciones
+/**
+ * OBTENER TODAS LAS FUNCIONES
+ * El usuario debe estar logeado
+ * Permite filtrar por idMovie, idRoom o una Fecha especifica
+ * Tambien acepta parametros como skip y limit
+ */
 app.get('/function', verifyToken, (req, res) => {
     
     let searchParams = {};
@@ -75,7 +80,13 @@ app.get('/function', verifyToken, (req, res) => {
 
 });
 
-// Obtener todas las funciones de un cine (Trae todas y luego las filtra)
+/**
+ * OBTENER LAS FUNCIONES DE UN CINE PARTICULAR
+ * EL usuario debe estar logeado y ser ADMIN
+ * Caso particular de la funcion anterior, pero se debe ser admin y enviar el ID del cine en la URL
+ * (Solo un ADMIN tiene acceso a los ID de los cines)
+ * Tambien acepta como parametros skip y limit
+ */
 app.get('/function/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let idCinema = req.params.id;
@@ -127,14 +138,18 @@ app.get('/function/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
-// Crear una funcion
-app.post('/function', [verifyToken, verifyAdminRole], async (req, res) => {
+/**
+ * CREAR UNA FUNCION DE CINE
+ * El usuario debe estar logeado y ser ADMIN
+ * Se reciben en el body el idRoom, idMovie, date (fecha en formato YYYY-MM-DD), hours y minutes
+ */
+app.post('/function', [verifyToken, verifyAdminRole], (req, res) => {
     
     let body = req.body;
 
     let date = new Date(body.date);
     date.setHours(body.hours, body.minutes);
-    // NO SE PORQUE ME CAMBIA LA HORA DE LA MANEA EN QUE LO HACE, PERO ESO LO ARRGLA 
+    // Pone la hora en tiempo local, porque resta cerca de 21hs la primera vez
     date.setTime( date.getTime() + date.getTimezoneOffset()*60*1000*7 );
 
     let movieFunction = new MovieFunction({
@@ -144,15 +159,16 @@ app.post('/function', [verifyToken, verifyAdminRole], async (req, res) => {
     });
 
     //CHECKEAR DISPONIBILIDAD DE LA SALA EN ESA FECHA/HORA EN BASE A LA DURACION DE LA PELICULA
-
     movieDuration(movieFunction.idMovie, (duration) => {
         checkNext(movieFunction.date, movieFunction.idRoom, duration, (date, resNext) => {
             checkPrev(date, movieFunction.idRoom, resNext, (resNext, resPrev) => {
 
-                if (resNext.ok === false) {
+                if (resNext.ok === false) { 
+                    //No se puede porque hay una funcion antes de que la nueva termine
                     return res.status(201).json(resNext)
                 } else {
                     if (resPrev.ok === false) {
+                        //No se puede porque hay una funcion antes de que la nueva empieze
                         return res.status(201).json(resPrev)
                     } else {
                         movieFunction.save((err, movieFunctionDB) => {
@@ -177,6 +193,13 @@ app.post('/function', [verifyToken, verifyAdminRole], async (req, res) => {
 
 });
 
+/**
+ * ELIMINAR UNA FUNCION DE CINE
+ * El usuario debe estar logeado y ser ADMIN
+ * Se recibe la id en la URL
+ * Elimina primero todos los tickets de la funcion, y luego la funcion misma
+ * (Seria mejor hacerlo con un trigger, pero "deleteMany" no los dispara segun la documentacion)
+ */
 app.delete('/function/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
@@ -213,8 +236,14 @@ app.delete('/function/:id', [verifyToken, verifyAdminRole], (req, res) => {
 });
 
 
+//FUNCIONES EXTRA
 
-// Obtener duración de la película
+/**
+ * OBTENER LA DURACION DE LA PELICULA
+ * Devuelve la duracion de la pelicula de la funcion
+ * @param {*} idMovieNF ID de la pelicula que se desea transmitir en la funcion
+ * @param {*} callback Se devuelven como parametros en el la duracion misma
+ */
 const movieDuration = (idMovieNF, callback) => {
     Movie.find({_id: idMovieNF}).exec((err, movieDB) => {
 
@@ -226,12 +255,22 @@ const movieDuration = (idMovieNF, callback) => {
         }
         
         callback(movieDB[0].minutes);
-        return movieDB[0].minutes;
+        return
         
     });
 }
 
-// Función para chequear que no vaya a empezar una película antes de que termine esta
+/**
+ * REVISAR DISPONIBILIDAD FUTURA DE LA SALA
+ * Obtiene la funcion siguiente calendarizada en la sala (si es que la hay), y verifica
+ * que la funcion que se desea crear termine antes de que esa funcion comienze.
+ * @param {*} dateNF Fecha de la funcion nueva
+ * @param {*} idRoom Sala en la que se la desea crear
+ * @param {*} duration Duracion de la funcion nueva
+ * @param {*} callback Se devuelven como parametros en el un objeto de estado
+ * Ese objeto dice si es posible con un ok:true o en caso contrario un ok:false
+ * (Tambien puede incluir un mensaje para aclarar)
+ */
 const checkNext = (dateNF, idRoom, duration, callback) => {
 
     MovieFunction.find({date: { $gte: dateNF }, idRoom: idRoom})
@@ -260,6 +299,7 @@ const checkNext = (dateNF, idRoom, duration, callback) => {
                 }
 
             } else {
+                // No se encontro una funcion a futuro
                 callback(dateNF, { ok: true })
                 return 
             }
@@ -268,7 +308,17 @@ const checkNext = (dateNF, idRoom, duration, callback) => {
 
 }
 
-//
+/**
+ * REVISAR DISPONIBILIDAD PREVIA DE LA SALA
+ * Obtiene la funcion previa calendarizada en la sala (si es que la hay), y verifica
+ * que la funcion que se desea crear empieze despues de que esa funcion termine.
+ * @param {*} dateNF Fecha de la funcion nueva
+ * @param {*} idRoom Sala en la que se la desea crear
+ * @param {*} resNext Respuesta del checkeo por funcion futura
+ * @param {*} callback Se devuelven como parametros en el resNext, y un objeto de estado
+ * Ese objeto dice si es posible con un ok:true o en caso contrario un ok:false
+ * (Tambien puede incluir un mensaje para aclarar)
+ */
 const checkPrev = (dateNF, idRoom, resNext, callback) => {
 
     MovieFunction.find({date: {$lte: dateNF}, idRoom: idRoom})
@@ -297,6 +347,7 @@ const checkPrev = (dateNF, idRoom, resNext, callback) => {
                 }
 
             } else {
+                // No se encontro una funcion anterior
                 callback(resNext, { ok: true });
                 return
             }

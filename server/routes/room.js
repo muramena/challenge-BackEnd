@@ -1,5 +1,3 @@
-// Cliente: 
-// Admin: GET, PUT, POST, DELETE
 const express = require('express');
 const Room = require('../models/room');
 const _ = require('underscore');
@@ -7,7 +5,12 @@ const { verifyAdminRole, verifyToken } = require('../middleware/authentication')
 
 const app = express();
 
-app.get('/room', [verifyToken, verifyAdminRole], function(req, res) {
+/**
+ * OBTENER TODAS LAS SALAS
+ * El usuario debe estar logeado y ser ADMIN
+ * Puede recibir como parametros opcionales skip y limit
+ */
+app.get('/room', [verifyToken, verifyAdminRole], (req, res) => {
     
     let skip = req.query.skip || 0;
     skip = Number(skip);
@@ -42,6 +45,11 @@ app.get('/room', [verifyToken, verifyAdminRole], function(req, res) {
 
 });
 
+/**
+ * OBTENER TODAS LAS SALAS DE UN CINE
+ * El usuario debe estar logeado y ser ADMIN
+ * Recibe en la URL el ID del cine
+ */
 app.get('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
@@ -71,6 +79,11 @@ app.get('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
+/**
+ * CREAR UNA SALA
+ * El usuario debe estar logeado y ser ADMIN
+ * Recibe en el body un idCinema, capacity, y un number(identificador interno dentro del cine)
+ */
 app.post('/room', [verifyToken, verifyAdminRole], (req, res) => {
     
     let body = req.body;
@@ -97,10 +110,15 @@ app.post('/room', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
+/**
+ * MODIFICAR UNA SALA
+ * El usuario debe estar logeado y ser admin
+ * Solo permite cambiar el number (identificador interno del cine) que se envia en el body
+ */
 app.put('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
  
     let id = req.params.id;
-    let body = _.pick(req.body, ['number', 'capacity']);
+    let body = _.pick(req.body, ['number']);
 
     Room.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, roomDB) => {
 
@@ -120,11 +138,16 @@ app.put('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
+/**
+ * ELIMINAR UNA SALA
+ * El usuario debe estar logeado y ser admin
+ * Se recibe en la URL el ID de la sala a eliminar
+ */
 app.delete('/room/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
 
-    //ELIMINA FUNCIONES FUTURAS
+    //FALTA ELIMINAR FUNCIONES FUTURAS
 
     Room.findByIdAndDelete(id, { runValidators: true }, (err, roomDB) => {
 

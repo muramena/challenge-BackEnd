@@ -1,13 +1,15 @@
-// Validación de token, validación de Rol
-
 const express = require('express');
 const Cinema = require('../models/cinema');
-const Room = require('../models/room');
 const _ = require('underscore');
 const { verifyAdminRole, verifyToken } = require('../middleware/authentication');
 
 const app = express();
 
+/**
+ * OBTENER CINES
+ * El usuario necesita estar logeado y ser admin
+ * Se pueden enviar como parametros opcionales un "name", "skip" y "limit"
+ */
 app.get('/cinema', [verifyToken, verifyAdminRole], (req, res) => {
     
     let searchParams = {
@@ -16,6 +18,7 @@ app.get('/cinema', [verifyToken, verifyAdminRole], (req, res) => {
 
     let name = req.query.name;
     if (name) {
+        //El nombre debe tener el "name", no hace falta coincidencia completa
         searchParams.name = { "$regex": name, "$options": "i" };
     }
 
@@ -51,6 +54,11 @@ app.get('/cinema', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
+/**
+ * CREAR UN NUEVO CINE
+ * El usuario necesita estar logeado y ser admin
+ * Es necesario el envio de un "name" en el body
+ */
 app.post('/cinema', [verifyToken, verifyAdminRole], (req, res) => {
 
     let body = req.body;
@@ -75,6 +83,11 @@ app.post('/cinema', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
+/**
+ * MODIFICAR UN CINE
+ * El usuario necesita estar logeado y ser admin
+ * En la URL se recibe el ID, y en el body se envia el "name" al que se quiere cambiar
+ */
 app.put('/cinema/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
@@ -98,6 +111,11 @@ app.put('/cinema/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
 });
 
+/**
+ * ELIMINAR UN CINE
+ * El usuario necesita estar logeado y ser admin
+ * En la URL se recibe el ID, y se lo elimina de manera logica para mantener un registro historico
+ */
 app.delete('/cinema/:id', [verifyToken, verifyAdminRole], (req, res) => {
 
     let id = req.params.id;

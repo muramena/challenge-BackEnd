@@ -20,18 +20,27 @@ Esta es mi entrega en lo que es el challenge de BackEnd.
 ### Situación actual
 
 - El sistema permite registro y logeo de usuarios (comun o cliente, y administrador).
+- Utiliza middlewares para confirmar tokens y roles de usuarios
 - Además de eso se pueden crear/eliminar cines, salas, películas, funciones y registrar ventas (previo checkeo de token y tipo de usuario en caso de ser necesario).
   - Hay checkeos para ver que una sala este disponible a la hora de crear una función, y que no vaya a ser ocupada durante la duración de la película
   - No es posible vender más entradas que la capacidad de la sala.
   - Cuando se elimina un cine, se eliminan de manera automática todas sus salas (eliminación lógica para mantener un registro histórico de funciones)
   - Cuando se elimina una función, se eliminan automáticamente sus tickets o entradas (eliminación real)
+- Búsqueda en todas las colecciones (previa autentificación):
+  - Cines: Se permite buscar por nombre, además de elegir una cantidad máxima y desde que elemento empezar
+  - Películas: Se permite buscar por título (No hace falta que sea completo, pueden ser todas las películas que tengan alguna "a" en el título), además de elegir una cantidad máxima y desde que elemento empezar
+  - Funciones: Se puede buscar todas las funciones dentro de un cine (eligiendo también un máximo de elementos y donde comenzar), o una búsqueda más general filtrando si se quiere por salas, películas o día (también con un máximo y un comienzo)
+  - Salas: Se pueden buscar las salas de un cine particular o las salas de la Base de Datos (eligiendo un máximo de elementos de retorno y un offset en la búsqueda)
+  - Tickets o entradas: Se pueden obtener los tickets asociados al usuario logeado, o una búsqueda más general filtrando por otro usuario o una función (para esto se debe ser ADMIN). En ambos casos se puede elegir un máximo de elementos de retorno y un offset en la búsqueda
+  - Usuarios: Permite búsqueda general, y filtrar por nombre o apellido (No hace falta que sean completos, pueden ser todos los usuarios que tengan una "p" en el nombre por ejemplo). Además elegir una cantidad de elementos a retornar, y un primer elemento de comienzo de búsqueda.
 
 ### Faltaría:
 
 - Subida de imágenes de perfíl
-- Validación de teléfono en el objeto de usuario
-- Normalizar la dirección en la colección de usuarios
+- Validación de teléfono en el modelo de usuario
+- Normalizar la dirección en la colección de usuarios (ciudad -> provincia -> pais)
 - Eliminar funciones futuras a la hora de eliminar una sala
+- Eliminar funciones futuras a la hora de eliminar una pelicula
 
 ## Instalación
 Una vez copiado el repositorio, ejecutar el comando 
@@ -47,4 +56,4 @@ node .\server\server.js
 ```
 
 ## Documentación de los endpoints
-[MIT](https://choosealicense.com/licenses/mit/)
+[ChallengeBack](https://documenter.getpostman.com/view/6482470/S1EQUyPD)
