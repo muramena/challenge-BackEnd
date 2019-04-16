@@ -7,6 +7,7 @@ const Schema = mongoose.Schema;
 const cinemaSchema = new Schema({
     name: {
         type: String,
+        trim: true,
         unique: true,
         required: [true, 'Es necesario el nombre del cine']
     },

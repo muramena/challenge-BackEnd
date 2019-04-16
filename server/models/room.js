@@ -27,6 +27,8 @@ const roomSchema = new Schema({
 // TRIGGER PREVIO A LA ELIMINACION
 // ELIMINA TODAS LAS FUNCIONES FUTURAS EN LA SALA (NO FUNCIONA)
 // deleteMany no dispara trigger, por eso se haría todo acá
+// "This function does not trigger any middleware" según la documentación
+// Está marcado como funcionalidad a agregar
 
 // roomSchema.pre('updateMany', async function(){
 

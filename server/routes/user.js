@@ -1,7 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const {  } = require('../middleware/authentication');
 const _ = require('underscore');
 const { verifyAdminRole, verifyToken } = require('../middleware/authentication');
 
@@ -91,9 +90,11 @@ app.post('/user', (req, res) => {
             });
         }
 
+        userJSON = userToJSON(userDB);
+
         res.json({
             ok: true,
-            user: userDB
+            user: userJSON
         });
     });
 
@@ -119,9 +120,11 @@ app.put('/user/:id', [verifyToken, verifyAdminRole], (req, res) => {
             });
         }
 
+        userJSON = userToJSON(userDB);
+
         res.json({
             ok: true,
-            user: userDB
+            user: userJSON
         });
 
     });
@@ -166,5 +169,22 @@ app.delete('/user/:id', [verifyToken, verifyAdminRole], (req, res) => {
     });
 
 });
+
+/**
+ * PREPARA EL USUARIO PARA DEVOLVERLO
+ * Elimina el campo de password
+ * @param {*} user Usuario a devolver
+ */
+const userToJSON = (user) => {
+    return {
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+        phone: user.phone,
+        img: user.img
+    }
+}
 
 module.exports = app;

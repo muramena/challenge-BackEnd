@@ -13,8 +13,6 @@ Esta es mi entrega en lo que es el challenge de BackEnd.
 
 *EXTRA:*
 *Considerar que el cine podria llegar a tener mas de una sala (donde se proyectaran las peliculas ) con capacidades diferentes, tener estos datos en cuenta al momento de la compra.*
-*Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.*
-
 
 
 ### Situación actual
@@ -47,6 +45,14 @@ Una vez copiado el repositorio, ejecutar el comando
 ```
 npm install
 ```
+Esto debería instalar:
+- bcrypt
+- body-parser
+- express
+- jsonwebtoken
+- mongoose
+- mongoose-unique-validator
+- underscore
 
 Luego de eso, montar el servidor (el archivo base del servidor que se encuentra en la carpeta **_server_**)
 

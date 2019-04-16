@@ -11,14 +11,17 @@ const Schema = mongoose.Schema;
 let userSchema = new Schema({
     name: {
         type: String,
+        trim: true,
         required: [true, 'El nombre es necesario']
     },
     lastname: {
         type: String,
+        trim: true,
         required: [true, 'El apellido es necesario']
     },
     email: {
         type: String,
+        trim: true,
         unique: true,
         required: [true, 'El email es necesario']
     },
@@ -28,6 +31,7 @@ let userSchema = new Schema({
     },
     address: { //DEBERIA NORMALIZARCE
         type: String,
+        trim: true,
         required: [true, 'La dirección es necesaria']
     },
     phone: { //FALTA VALIDAR
@@ -51,15 +55,26 @@ let userSchema = new Schema({
 
 userSchema.plugin(uniqueValidator, { message: '{PATH} debe de ser único' });
 
+userSchema.methods.toJSON = () => {
+
+    let user = this;
+
+    let userJSON = {
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+        phone: user.phone,
+        img: user.img
+    }
+
+    console.log(user);
+    console.log(userJSON);
+
+    return userJSON;
+}
+
 module.exports = mongoose.model('User', userSchema);
 
 
-
-// userSchema.methods.toJSON = function() {
-
-//     let user = this;
-//     let userObject = user.toObject();
-//     delete userObject.password;
-
-//     return userObject;
-// }

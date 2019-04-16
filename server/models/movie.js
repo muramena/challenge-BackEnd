@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const movieSchema = new Schema({
     title: {
         type: String,
+        trim: true,
         required: [true, 'Es necesario un título para agregar la película']
     },
     year: {
